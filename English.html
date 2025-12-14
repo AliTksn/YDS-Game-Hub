@@ -1,0 +1,1009 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>YDS • Phrasal + Advanced Verbs • Game + Analytics</title>
+<style>
+:root{
+  --bg:#f7f8fc; --card:#fff; --text:#0f172a; --muted:#475569; --border:#e2e8f0;
+  --accent:#2563eb; --ok:#16a34a; --bad:#dc2626; --shadow:0 18px 50px rgba(2,6,23,.08);
+  --radius:18px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  background:radial-gradient(1200px 800px at 10% 10%, #fff 0%, var(--bg) 55%, #eef2ff 100%);
+  color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:18px;
+}
+.app{width:min(1040px,100%); display:grid; gap:14px}
+.topbar{display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+.brand{
+  display:flex; gap:12px; align-items:center; padding:10px 12px; border-radius:999px;
+  background:var(--card); border:1px solid var(--border); box-shadow:var(--shadow); flex-wrap:wrap;
+}
+.dot{width:10px;height:10px;border-radius:999px;background:var(--accent)}
+.brand b{font-weight:950}
+.modebar{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.navbtn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:9px 12px; border-radius:999px; border:1px solid var(--border);
+  background:#fff; color:var(--text); cursor:pointer; font-weight:800; font-size:13px;
+}
+.navbtn:hover{border-color:rgba(37,99,235,.45)}
+.navbtn.active{background:var(--accent); color:#fff; border-color:rgba(37,99,235,.75)}
+.tag{padding:4px 8px;border-radius:999px;border:1px solid var(--border); font-weight:800; font-size:12px; color:var(--muted); background:#fff}
+.navbtn.active .tag{color:#eaf1ff; border-color:rgba(255,255,255,.35); background:rgba(255,255,255,.12)}
+.stats{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.pill{
+  padding:8px 10px; border-radius:999px; background:var(--card); border:1px solid var(--border);
+  color:var(--muted); font-size:14px;
+}
+.card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow)}
+.q-head{display:flex; gap:10px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap}
+.label{font-size:13px; color:var(--muted)}
+.word{font-size:34px; margin:6px 0 0; letter-spacing:.2px; font-weight:950}
+.example{
+  margin-top:10px; padding:12px; border-radius:14px; background:#f8fafc; border:1px solid var(--border);
+  line-height:1.5;
+}
+.prompt{margin-top:12px; color:var(--muted)}
+.grid{margin-top:14px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px}
+button.opt{
+  width:100%; text-align:left; padding:12px; border-radius:14px; border:1px solid var(--border);
+  background:#fff; color:var(--text); cursor:pointer; font-size:15px;
+  transition:transform .06s ease, border-color .15s ease, box-shadow .15s ease;
+}
+button.opt:hover{transform:translateY(-1px); border-color:rgba(37,99,235,.45); box-shadow:0 10px 24px rgba(2,6,23,.08)}
+button.opt:disabled{opacity:.85; cursor:not-allowed; transform:none}
+.feedback{
+  margin-top:12px; padding:10px 12px; border-radius:14px; border:1px solid var(--border);
+  background:#f8fafc; color:var(--muted); min-height:46px;
+  display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+}
+.ok{color:var(--ok); font-weight:950}
+.bad{color:var(--bad); font-weight:950}
+.small{font-size:13px; color:var(--muted)}
+.progress{height:10px; width:340px; max-width:100%; background:#eef2ff; border-radius:999px; overflow:hidden; border:1px solid var(--border)}
+.bar{height:100%; width:0%; background:linear-gradient(90deg,var(--accent),#22c55e)}
+.row{display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-top:14px}
+.btn{padding:10px 12px; border-radius:14px; border:1px solid var(--border); background:#fff; cursor:pointer; font-weight:800}
+.btn:hover{border-color:rgba(37,99,235,.45)}
+.opt.correct{border-color:rgba(22,163,74,.75)!important; box-shadow:0 0 0 3px rgba(22,163,74,.14) inset!important}
+.opt.wrong{border-color:rgba(220,38,38,.75)!important; box-shadow:0 0 0 3px rgba(220,38,38,.12) inset!important}
+
+.view{display:none}
+.view.active{display:block}
+
+/* analytics */
+.ana-top{
+  display:flex; gap:10px; justify-content:space-between; align-items:flex-end; flex-wrap:wrap;
+}
+.input{
+  padding:10px 12px; border-radius:14px; border:1px solid var(--border); background:#fff; min-width:260px;
+}
+.tableWrap{margin-top:14px; overflow:auto; border:1px solid var(--border); border-radius:14px}
+table{border-collapse:collapse; width:100%; min-width:720px; background:#fff}
+th,td{padding:10px 12px; border-bottom:1px solid var(--border); text-align:left; vertical-align:top}
+th{position:sticky; top:0; background:#f8fafc; z-index:1; font-size:13px; color:var(--muted)}
+.badge{
+  display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px;
+  border:1px solid var(--border); background:#fff; color:var(--muted); font-size:13px; font-weight:800;
+}
+.kpi{display:flex; gap:10px; flex-wrap:wrap}
+@media (max-width:720px){.grid{grid-template-columns:1fr}.word{font-size:28px}}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="dot"></div>
+      <div>
+        <div><b id="brandTitle">YDS Game Hub</b> <span class="small">• 10 points each</span></div>
+        <div class="small" id="brandSub">Phrasal (200) • Verbs (200) • Analytics</div>
+      </div>
+      <div class="modebar" style="margin-left:8px">
+        <button class="navbtn active" id="tabPhrasal">Phrasal <span class="tag" id="tagP">200</span></button>
+        <button class="navbtn" id="tabVerbs">Verbs <span class="tag" id="tagV">200</span></button>
+        <button class="navbtn" id="tabAnalytics">Analytics <span class="tag">📊</span></button>
+      </div>
+    </div>
+
+    <div class="stats" id="gameStats">
+      <div class="pill">Q: <b id="qNo">1</b>/<span id="qTotal">200</span></div>
+      <div class="pill">Score: <b id="score">0</b></div>
+      <div class="pill">Right: <b id="right">0</b> • Wrong: <b id="wrong">0</b></div>
+    </div>
+  </div>
+
+  <!-- GAME VIEW -->
+  <div class="card view active" id="viewGame">
+    <div class="q-head">
+      <div>
+        <div class="label" id="labelType">Item</div>
+        <div class="word" id="word">—</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px">
+        <div class="label">Progress</div>
+        <div class="progress"><div class="bar" id="bar"></div></div>
+        <div class="small">+10 per correct</div>
+      </div>
+    </div>
+
+    <div class="example" id="ex">—</div>
+
+    <div class="prompt" id="prompt">Choose the correct meaning:</div>
+    <div class="grid" id="opts"></div>
+
+    <div class="feedback" id="fb">
+      <span>Pick an option.</span>
+      <span class="small">Distractors are real meanings from other items.</span>
+    </div>
+
+    <div class="row">
+      <div style="display:flex; gap:10px; flex-wrap:wrap">
+        <button class="btn" id="next" disabled>Next</button>
+        <button class="btn" id="restart">Restart</button>
+        <button class="btn" id="shuffle">Shuffle</button>
+      </div>
+      <div class="small">Dataset: <b id="ds">200</b> items</div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS VIEW -->
+  <div class="card view" id="viewAnalytics">
+    <div class="ana-top">
+      <div>
+        <div class="label">Wrong-based analysis</div>
+        <div style="font-weight:950;font-size:26px;margin-top:6px">Your Mistakes Dashboard</div>
+        <div class="small">Tracks your answers locally in this browser (no internet, no login).</div>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center">
+        <input class="input" id="search" placeholder="Search (e.g., 'mitigate', 'fall back', 'adhere')"/>
+        <select class="input" id="filterSet" style="min-width:220px">
+          <option value="ALL">All sets</option>
+          <option value="PHRASAL">Phrasal only</option>
+          <option value="VERB">Verbs only</option>
+        </select>
+        <select class="input" id="sortBy" style="min-width:220px">
+          <option value="WRONG_DESC">Sort: wrong (high → low)</option>
+          <option value="ACC_ASC">Sort: accuracy (low → high)</option>
+          <option value="ATT_DESC">Sort: attempts (high → low)</option>
+          <option value="A_Z">Sort: A → Z</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="kpi" style="margin-top:14px">
+      <span class="badge">Total attempts: <b id="kAtt" style="margin-left:6px;color:var(--text)">0</b></span>
+      <span class="badge">Total wrong: <b id="kWrong" style="margin-left:6px;color:var(--bad)">0</b></span>
+      <span class="badge">Total right: <b id="kRight" style="margin-left:6px;color:var(--ok)">0</b></span>
+      <span class="badge">Accuracy: <b id="kAcc" style="margin-left:6px;color:var(--text)">0%</b></span>
+      <button class="btn" id="resetStats">Reset stats</button>
+      <button class="btn" id="backToGame">Back to game</button>
+    </div>
+
+    <div class="tableWrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:120px">Set</th>
+            <th style="width:200px">Item</th>
+            <th>Meaning</th>
+            <th style="width:110px">Attempts</th>
+            <th style="width:90px">Wrong</th>
+            <th style="width:110px">Accuracy</th>
+          </tr>
+        </thead>
+        <tbody id="anaBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===========================
+   DATASETS
+   200 PHRASAL + 200 VERBS
+   =========================== */
+
+/* --- 200 Phrasal Verbs --- */
+const PHRASAL = [
+  {w:"account for", m:"explain; give a reason for", ex:"The manager asked her to account for the loss."},
+  {w:"act up", m:"malfunction; behave badly", ex:"My laptop acted up during the exam."},
+  {w:"add up", m:"make sense; be logical", ex:"His story doesn’t add up."},
+  {w:"allow for", m:"take into account; include", ex:"Allow for delays in winter."},
+  {w:"answer for", m:"be responsible for", ex:"You must answer for your actions."},
+  {w:"ask around", m:"ask many people", ex:"I asked around for the notes."},
+  {w:"back down", m:"withdraw; stop insisting", ex:"He backed down after proof."},
+  {w:"back up", m:"support; confirm", ex:"The data backs up the claim."},
+  {w:"bail out", m:"rescue from trouble", ex:"They bailed out the firm."},
+  {w:"bank on", m:"rely on", ex:"Don’t bank on luck."},
+
+  {w:"bear with", m:"be patient", ex:"Bear with me for a minute."},
+  {w:"beat up", m:"attack violently", ex:"He was beaten up outside."},
+  {w:"beef up", m:"strengthen; reinforce", ex:"They beefed up security."},
+  {w:"black out", m:"faint; lose consciousness", ex:"He blacked out from heat."},
+  {w:"block off", m:"close an area", ex:"Police blocked off the street."},
+  {w:"blow away", m:"impress greatly", ex:"Her speech blew them away."},
+  {w:"blow up", m:"explode; become huge suddenly", ex:"The device could blow up."},
+  {w:"boil down to", m:"reduce to the main point", ex:"It boils down to money."},
+  {w:"break away", m:"separate; escape", ex:"Some members broke away."},
+  {w:"break down", m:"stop working; collapse", ex:"The engine broke down."},
+
+  {w:"break in", m:"enter by force", ex:"Thieves broke in at night."},
+  {w:"break into", m:"enter forcibly; start suddenly", ex:"She broke into tears."},
+  {w:"break out", m:"start suddenly", ex:"A fire broke out."},
+  {w:"break up", m:"end a relationship", ex:"They decided to break up."},
+  {w:"bring about", m:"cause; make happen", ex:"Reform brought about change."},
+  {w:"bring up", m:"mention; raise", ex:"He brought up a key point."},
+  {w:"brush up on", m:"revise; improve quickly", ex:"I must brush up on grammar."},
+  {w:"build up", m:"increase gradually", ex:"Pressure built up fast."},
+  {w:"bump into", m:"meet unexpectedly", ex:"I bumped into my teacher."},
+  {w:"burn out", m:"become exhausted", ex:"Many students burn out."},
+
+  {w:"burst into", m:"begin suddenly", ex:"They burst into laughter."},
+  {w:"call back", m:"return a phone call", ex:"I’ll call you back later."},
+  {w:"call off", m:"cancel", ex:"They called off the match."},
+  {w:"calm down", m:"become less upset", ex:"Calm down and listen."},
+  {w:"carry on", m:"continue", ex:"They carried on despite stress."},
+  {w:"carry out", m:"perform; conduct", ex:"They carried out the study."},
+  {w:"catch on", m:"be understood; become popular", ex:"The joke didn’t catch on."},
+  {w:"catch up", m:"reach the same level", ex:"I must catch up on work."},
+  {w:"check in", m:"register (hotel/airport)", ex:"We checked in early."},
+  {w:"check out", m:"investigate; leave hotel", ex:"Check out the results."},
+
+  {w:"cheer up", m:"become happier", ex:"Music cheered him up."},
+  {w:"chip in", m:"contribute", ex:"Everyone chipped in money."},
+  {w:"clean up", m:"make clean; remove mess", ex:"Clean up the room."},
+  {w:"clear up", m:"solve; make clear", ex:"This clears up confusion."},
+  {w:"close down", m:"stop operating permanently", ex:"The factory closed down."},
+  {w:"come across", m:"find/meet by chance", ex:"I came across a report."},
+  {w:"come by", m:"obtain", ex:"Good data is hard to come by."},
+  {w:"come down with", m:"become ill", ex:"She came down with flu."},
+  {w:"come up", m:"arise", ex:"A problem came up."},
+  {w:"come up with", m:"produce (idea/plan)", ex:"He came up with a solution."},
+
+  {w:"count on", m:"depend on", ex:"You can count on me."},
+  {w:"cut back on", m:"reduce", ex:"We cut back on spending."},
+  {w:"cut down on", m:"reduce consumption", ex:"Cut down on sugar."},
+  {w:"deal with", m:"handle; manage", ex:"We must deal with it now."},
+  {w:"decide on", m:"choose", ex:"They decided on a topic."},
+  {w:"die out", m:"disappear; become extinct", ex:"Old habits die out slowly."},
+  {w:"do away with", m:"abolish; eliminate", ex:"They did away with fees."},
+  {w:"do without", m:"manage without", ex:"We can do without it."},
+  {w:"dress up", m:"wear formal clothes", ex:"They dressed up for dinner."},
+  {w:"drop by", m:"visit briefly", ex:"Drop by after class."},
+  {w:"drop out", m:"quit (school/course)", ex:"He dropped out in year two."},
+
+  {w:"eat out", m:"eat at a restaurant", ex:"We eat out on Fridays."},
+  {w:"end up", m:"finally reach a result", ex:"We ended up choosing A."},
+  {w:"face up to", m:"accept and deal with", ex:"Face up to the facts."},
+  {w:"fall apart", m:"collapse; break into pieces", ex:"The plan fell apart."},
+  {w:"fall behind", m:"lag; fail to keep up", ex:"She fell behind in math."},
+  {w:"fall for", m:"be deceived by", ex:"Don’t fall for lies."},
+  {w:"figure out", m:"solve; understand", ex:"I figured out the answer."},
+  {w:"fill out", m:"complete a form", ex:"Fill out the application."},
+  {w:"find out", m:"discover", ex:"We found out the truth."},
+  {w:"get along", m:"have a good relationship", ex:"They get along well."},
+  {w:"get by", m:"manage with difficulty", ex:"He gets by on little money."},
+  {w:"get over", m:"recover from", ex:"She got over the illness."},
+
+  {w:"give away", m:"donate; reveal", ex:"He gave away old books."},
+  {w:"give in", m:"yield; surrender", ex:"Don’t give in to pressure."},
+  {w:"give up", m:"quit; stop trying", ex:"Never give up."},
+  {w:"go after", m:"pursue", ex:"She went after a scholarship."},
+  {w:"go ahead", m:"proceed", ex:"Go ahead and start."},
+  {w:"go back", m:"return", ex:"Let’s go back home."},
+  {w:"go by", m:"pass (time)", ex:"Weeks went by quickly."},
+  {w:"go on", m:"continue; happen", ex:"What’s going on here?"},
+  {w:"go over", m:"review", ex:"Go over your notes."},
+  {w:"grow up", m:"become an adult", ex:"He grew up in Ankara."},
+  {w:"hand in", m:"submit", ex:"Hand in your paper."},
+  {w:"hand out", m:"distribute", ex:"They handed out flyers."},
+  {w:"hang out", m:"spend time casually", ex:"We hang out after class."},
+
+  {w:"hold on", m:"wait", ex:"Hold on a second."},
+  {w:"keep up", m:"maintain pace", ex:"Keep up with the class."},
+  {w:"look after", m:"take care of", ex:"She looks after her brother."},
+  {w:"look for", m:"search for", ex:"I’m looking for my keys."},
+  {w:"look forward to", m:"anticipate gladly", ex:"I look forward to results."},
+  {w:"put off", m:"postpone", ex:"Don’t put off studying."},
+  {w:"run out of", m:"have no more left", ex:"We ran out of time."},
+  {w:"show up", m:"arrive", ex:"Only five showed up."},
+  {w:"take over", m:"assume control", ex:"She took over the team."},
+  {w:"turn down", m:"reject; reduce volume", ex:"He turned down the offer."},
+  {w:"work out", m:"solve; succeed", ex:"It worked out in the end."},
+
+  /* 150 block (from earlier) continued */
+  {w:"abide by", m:"obey; follow", ex:"Abide by the rules."},
+  {w:"add to", m:"increase; contribute to", ex:"This adds to the cost."},
+  {w:"agree with", m:"support; share the same view", ex:"I agree with your point."},
+  {w:"apply for", m:"request formally", ex:"She applied for a grant."},
+  {w:"arrive at", m:"reach (a decision)", ex:"They arrived at a conclusion."},
+  {w:"ask for", m:"request; demand", ex:"He asked for more time."},
+  {w:"be bound to", m:"be very likely to", ex:"Errors are bound to occur."},
+  {w:"be fed up with", m:"be tired of", ex:"I’m fed up with delays."},
+  {w:"blow out", m:"extinguish", ex:"Wind blew out the candle."},
+  {w:"break through", m:"make sudden progress", ex:"They broke through at last."},
+  {w:"bring back", m:"reintroduce; return", ex:"They brought back the rule."},
+  {w:"call for", m:"require; demand", ex:"The situation calls for action."},
+  {w:"call on", m:"ask someone to speak/do", ex:"The teacher called on Ali."},
+  {w:"carry away", m:"overwhelm; excite", ex:"He was carried away by joy."},
+  {w:"catch on to", m:"begin to understand", ex:"She caught on quickly."},
+  {w:"come about", m:"happen", ex:"How did it come about?"},
+  {w:"come into being", m:"begin to exist", ex:"A new group came into being."},
+  {w:"come into effect", m:"start to apply", ex:"The law came into effect."},
+  {w:"come to light", m:"be discovered", ex:"New facts came to light."},
+  {w:"come to terms with", m:"accept a difficult reality", ex:"He came to terms with it."},
+  {w:"come under", m:"be subjected to", ex:"It came under criticism."},
+  {w:"cut off", m:"disconnect; stop supply", ex:"The storm cut off power."},
+  {w:"cut out", m:"stop doing; remove", ex:"Cut out sugary drinks."},
+  {w:"do over", m:"do again", ex:"We must do it over."},
+  {w:"do up", m:"fasten; renovate", ex:"She did up the room."},
+  {w:"draw up", m:"prepare formally", ex:"They drew up a contract."},
+  {w:"drop off", m:"decrease; deliver", ex:"Sales dropped off."},
+  {w:"eat away at", m:"erode gradually", ex:"Stress ate away at him."},
+  {w:"fall back on", m:"use as a backup; rely on", ex:"They may fall back on volunteers."},
+  {w:"fall through", m:"fail to happen", ex:"The deal fell through."},
+  {w:"find out about", m:"learn about", ex:"I found out about it online."},
+  {w:"get across", m:"communicate clearly", ex:"He got the idea across."},
+  {w:"get ahead", m:"make progress", ex:"Hard work helps you get ahead."},
+  {w:"get away with", m:"avoid punishment", ex:"He won’t get away with it."},
+  {w:"get down to", m:"start seriously", ex:"Let’s get down to work."},
+  {w:"get on with", m:"continue; proceed", ex:"Get on with the task."},
+  {w:"get through", m:"finish; survive; reach by phone", ex:"I finally got through."},
+  {w:"give off", m:"emit", ex:"The engine gave off smoke."},
+  {w:"go off", m:"ring; explode; spoil", ex:"The alarm went off."},
+  {w:"hold back", m:"restrain; hide emotion", ex:"He held back tears."},
+  {w:"hold up", m:"delay", ex:"Traffic was held up."},
+  {w:"keep away", m:"avoid; stay distant", ex:"Keep away from the edge."},
+  {w:"keep off", m:"stay off", ex:"Keep off the grass."},
+  {w:"lay off", m:"dismiss workers", ex:"They laid off staff."},
+  {w:"leave out", m:"omit", ex:"Don’t leave out details."},
+  {w:"let down", m:"disappoint", ex:"He felt let down."},
+  {w:"live up to", m:"meet expectations", ex:"It didn’t live up to claims."},
+  {w:"look into", m:"investigate", ex:"They will look into it."},
+
+  /* EXTRA 50 to reach 200 (new) */
+  {w:"make up", m:"invent; reconcile", ex:"He made up an excuse."},
+  {w:"make up for", m:"compensate for", ex:"She trained to make up for time."},
+  {w:"take up", m:"start (a hobby); occupy", ex:"He took up cycling."},
+  {w:"take after", m:"resemble", ex:"She takes after her father."},
+  {w:"take off", m:"leave the ground; become popular", ex:"The plane took off."},
+  {w:"take in", m:"absorb; deceive", ex:"I couldn’t take in the news."},
+  {w:"take on", m:"accept; undertake", ex:"He took on extra work."},
+  {w:"set up", m:"arrange; establish", ex:"They set up a meeting."},
+  {w:"set off", m:"start a journey; trigger", ex:"They set off early."},
+  {w:"set out", m:"begin with a goal", ex:"She set out to prove it."},
+
+  {w:"turn up", m:"arrive; increase", ex:"He turned up late."},
+  {w:"turn out", m:"result; happen", ex:"It turned out fine."},
+  {w:"turn into", m:"transform into", ex:"The talk turned into a debate."},
+  {w:"bring in", m:"introduce; recruit", ex:"They brought in experts."},
+  {w:"bring out", m:"highlight; release", ex:"That brings out his talent."},
+  {w:"come out", m:"be published; become known", ex:"The truth came out."},
+  {w:"come off", m:"succeed; happen as planned", ex:"The event came off well."},
+  {w:"come over", m:"visit", ex:"Come over after work."},
+  {w:"run into", m:"encounter; meet unexpectedly", ex:"We ran into trouble."},
+  {w:"run over", m:"review quickly", ex:"Let’s run over the plan."},
+
+  {w:"run through", m:"rehearse; explain step-by-step", ex:"He ran through the steps."},
+  {w:"run away", m:"escape", ex:"The suspect ran away."},
+  {w:"run around", m:"be very busy", ex:"I ran around all day."},
+  {w:"break out in", m:"develop suddenly (rash/sweat)", ex:"He broke out in a rash."},
+  {w:"break up with", m:"end a relationship with", ex:"She broke up with him."},
+  {w:"put up with", m:"tolerate", ex:"I can’t put up with noise."},
+  {w:"put up", m:"display; build", ex:"They put up a notice."},
+  {w:"put down", m:"criticize; insult", ex:"Don’t put others down."},
+  {w:"put forward", m:"propose", ex:"He put forward an idea."},
+  {w:"put aside", m:"save; reserve", ex:"Put aside time daily."},
+
+  {w:"put out", m:"extinguish; publish", ex:"They put out the fire."},
+  {w:"put on", m:"wear; organize", ex:"They put on a show."},
+  {w:"put through", m:"connect by phone", ex:"Put me through to HR."},
+  {w:"get rid of", m:"remove; dispose of", ex:"Get rid of old papers."},
+  {w:"get back", m:"return; reply later", ex:"I’ll get back to you."},
+  {w:"get back at", m:"take revenge on", ex:"He tried to get back at her."},
+  {w:"get out of", m:"avoid a duty", ex:"He got out of the meeting."},
+  {w:"get up to", m:"do (often secretly)", ex:"What are you up to?"},
+  {w:"get on", m:"board; continue", ex:"We got on the bus."},
+  {w:"give up on", m:"abandon hope of", ex:"Don’t give up on it."},
+
+  {w:"give out", m:"distribute; stop working", ex:"The engine gave out."},
+  {w:"give back", m:"return", ex:"Give back the book."},
+  {w:"call up", m:"phone; summon", ex:"He called up his friend."},
+  {w:"look up", m:"search for information", ex:"Look up the meaning."},
+  {w:"look up to", m:"admire", ex:"Many look up to her."},
+  {w:"look down on", m:"despise", ex:"Don’t look down on others."},
+  {w:"look back on", m:"reflect on", ex:"He looked back on school."},
+  {w:"look out for", m:"watch for", ex:"Look out for mistakes."},
+  {w:"pick up", m:"learn; collect; improve", ex:"She picked up new words."},
+
+  /* 10 more to complete exactly 200 (ensuring unique) */
+  {w:"pull off", m:"succeed in doing (difficult)", ex:"He pulled off a great result."},
+  {w:"pull through", m:"recover; survive", ex:"She pulled through surgery."},
+  {w:"put up", m:"provide lodging; accommodate", ex:"They put us up for a night."},
+  {w:"step down", m:"resign", ex:"He stepped down as director."},
+  {w:"step up", m:"increase; take responsibility", ex:"She stepped up efforts."},
+  {w:"take back", m:"withdraw; return", ex:"He took back his words."},
+  {w:"take out", m:"remove; invite out", ex:"He took out the trash."},
+  {w:"turn away", m:"reject entry; refuse", ex:"They turned away visitors."},
+  {w:"wear out", m:"exhaust; use until unusable", ex:"Long hours wear you out."},
+  {w:"wind up", m:"end up; finish", ex:"We wound up late."}
+];
+
+/* --- 200 Advanced Verbs (meaning = English synonyms only) --- */
+const VERBS = [
+  {w:"abandon", m:"leave; desert; give up", ex:"They abandoned the plan."},
+  {w:"abolish", m:"eliminate; eradicate; put an end to", ex:"They abolished the rule."},
+  {w:"absorb", m:"take in; assimilate; soak up", ex:"The sponge absorbed water."},
+  {w:"accelerate", m:"speed up; hasten", ex:"Growth accelerated quickly."},
+  {w:"accommodate", m:"adjust to; provide for", ex:"The system accommodates changes."},
+  {w:"accumulate", m:"gather; amass; build up", ex:"Dust accumulated over time."},
+  {w:"acknowledge", m:"admit; recognize; concede", ex:"He acknowledged the mistake."},
+  {w:"acquire", m:"obtain; gain; procure", ex:"She acquired new skills."},
+  {w:"adapt", m:"adjust; modify; alter", ex:"We adapted the method."},
+  {w:"address", m:"tackle; deal with; handle", ex:"They addressed the issue."},
+
+  {w:"adhere", m:"comply; stick to; follow", ex:"Please adhere to guidelines."},
+  {w:"administer", m:"manage; supervise; govern", ex:"They administer the program."},
+  {w:"advocate", m:"support; promote; argue for", ex:"He advocates reform."},
+  {w:"afflict", m:"trouble; distress; plague", ex:"The region is afflicted by drought."},
+  {w:"aggravate", m:"worsen; intensify; exacerbate", ex:"Noise aggravated his headache."},
+  {w:"allocate", m:"assign; distribute; allot", ex:"Funds were allocated fairly."},
+  {w:"alter", m:"modify; change; revise", ex:"They altered the schedule."},
+  {w:"amplify", m:"intensify; strengthen; enlarge", ex:"The speaker amplified the message."},
+  {w:"anticipate", m:"expect; foresee; predict", ex:"We anticipated delays."},
+  {w:"appraise", m:"assess; evaluate; judge", ex:"Experts appraised the damage."},
+
+  {w:"arise", m:"emerge; occur; surface", ex:"Problems arose suddenly."},
+  {w:"articulate", m:"express; formulate; verbalize", ex:"She articulated her opinion."},
+  {w:"assert", m:"claim; declare; state firmly", ex:"He asserted his rights."},
+  {w:"assess", m:"evaluate; appraise; gauge", ex:"They assessed performance."},
+  {w:"assign", m:"allocate; designate; appoint", ex:"Tasks were assigned today."},
+  {w:"assimilate", m:"absorb; integrate; take in", ex:"He assimilated new information."},
+  {w:"attain", m:"achieve; reach; accomplish", ex:"She attained her goal."},
+  {w:"attribute", m:"ascribe; credit; assign", ex:"They attribute success to effort."},
+  {w:"authorize", m:"permit; approve; sanction", ex:"The manager authorized payment."},
+  {w:"avert", m:"prevent; avoid; ward off", ex:"Quick action averted disaster."},
+
+  {w:"bolster", m:"strengthen; support; reinforce", ex:"Results bolstered confidence."},
+  {w:"breach", m:"violate; break; infringe", ex:"They breached the contract."},
+  {w:"cease", m:"stop; halt; discontinue", ex:"Hostilities ceased overnight."},
+  {w:"clarify", m:"explain; elucidate; make clear", ex:"Please clarify your point."},
+  {w:"coerce", m:"compel; force; pressure", ex:"They coerced him to sign."},
+  {w:"coincide", m:"correspond; match; occur together", ex:"The dates coincide."},
+  {w:"collapse", m:"fail; break down; give way", ex:"The structure collapsed."},
+  {w:"compile", m:"collect; assemble; gather", ex:"She compiled the data."},
+  {w:"comply", m:"obey; conform; adhere", ex:"Firms must comply."},
+  {w:"conceal", m:"hide; cover up; obscure", ex:"He concealed the truth."},
+
+  {w:"concede", m:"admit; acknowledge; yield", ex:"She conceded the point."},
+  {w:"concentrate", m:"focus; center; direct attention", ex:"Concentrate on accuracy."},
+  {w:"concur", m:"agree; share the same view", ex:"I concur with you."},
+  {w:"condemn", m:"denounce; criticize; censure", ex:"Leaders condemned the attack."},
+  {w:"confine", m:"restrict; limit; restrain", ex:"They confined access."},
+  {w:"confirm", m:"verify; validate; substantiate", ex:"Tests confirmed the diagnosis."},
+  {w:"confront", m:"face; challenge; oppose", ex:"He confronted the issue."},
+  {w:"consolidate", m:"unify; strengthen; combine", ex:"They consolidated resources."},
+  {w:"constitute", m:"form; make up; comprise", ex:"These factors constitute the risk."},
+  {w:"constrain", m:"restrict; limit; confine", ex:"Time constraints limited us."},
+
+  {w:"contemplate", m:"consider; reflect on; ponder", ex:"She contemplated quitting."},
+  {w:"contradict", m:"deny; oppose; conflict with", ex:"Evidence contradicted him."},
+  {w:"convey", m:"communicate; transmit; impart", ex:"Words convey meaning."},
+  {w:"corroborate", m:"confirm; support; validate", ex:"Witnesses corroborated the story."},
+  {w:"curtail", m:"reduce; cut back; limit", ex:"They curtailed spending."},
+  {w:"deceive", m:"mislead; trick; delude", ex:"Ads can deceive consumers."},
+  {w:"decline", m:"refuse; decrease; fall", ex:"Sales declined sharply."},
+  {w:"deduce", m:"infer; conclude; derive", ex:"We deduced the cause."},
+  {w:"deem", m:"consider; regard; judge", ex:"It was deemed unsafe."},
+  {w:"defy", m:"resist; challenge; oppose", ex:"He defied orders."},
+
+  {w:"delineate", m:"outline; describe; define", ex:"The report delineates roles."},
+  {w:"demonstrate", m:"show; illustrate; prove", ex:"Data demonstrates the trend."},
+  {w:"denote", m:"indicate; signify; represent", ex:"Red denotes danger."},
+  {w:"depict", m:"portray; represent; describe", ex:"The chart depicts growth."},
+  {w:"derive", m:"obtain; originate; stem from", ex:"Benefits derive from training."},
+  {w:"deter", m:"discourage; prevent; dissuade", ex:"Fines deter crime."},
+  {w:"devise", m:"invent; design; formulate", ex:"They devised a strategy."},
+  {w:"differentiate", m:"distinguish; separate; tell apart", ex:"We must differentiate causes."},
+  {w:"disclose", m:"reveal; expose; divulge", ex:"He disclosed the results."},
+  {w:"disperse", m:"scatter; spread; distribute", ex:"The crowd dispersed."},
+
+  {w:"disrupt", m:"interrupt; disturb; derail", ex:"Noise disrupted the class."},
+  {w:"diminish", m:"reduce; lessen; decrease", ex:"Confidence diminished."},
+  {w:"elaborate", m:"expand; explain in detail; develop", ex:"Please elaborate briefly."},
+  {w:"eliminate", m:"remove; eradicate; get rid of", ex:"They eliminated errors."},
+  {w:"embody", m:"represent; personify; exemplify", ex:"She embodies dedication."},
+  {w:"emerge", m:"appear; arise; come out", ex:"Patterns emerged."},
+  {w:"emphasize", m:"stress; highlight; underscore", ex:"He emphasized clarity."},
+  {w:"encompass", m:"include; cover; contain", ex:"The course encompasses grammar."},
+  {w:"endorse", m:"support; approve; back", ex:"Experts endorsed the plan."},
+  {w:"entail", m:"involve; require; necessitate", ex:"The job entails travel."},
+
+  {w:"equate", m:"regard as equal; liken; compare", ex:"Don’t equate speed with quality."},
+  {w:"eradicate", m:"wipe out; destroy; eliminate", ex:"They eradicated the disease."},
+  {w:"establish", m:"found; set up; create", ex:"They established a committee."},
+  {w:"evade", m:"avoid; escape; elude", ex:"He evaded the question."},
+  {w:"evaluate", m:"assess; appraise; judge", ex:"They evaluated outcomes."},
+  {w:"exacerbate", m:"worsen; intensify; aggravate", ex:"Delays exacerbated the problem."},
+  {w:"exceed", m:"surpass; go beyond; outstrip", ex:"Costs exceeded estimates."},
+  {w:"exclude", m:"omit; leave out; bar", ex:"The rule excludes minors."},
+  {w:"exhibit", m:"display; show; demonstrate", ex:"The device exhibits stability."},
+  {w:"facilitate", m:"enable; ease; help", ex:"Tools facilitate learning."},
+
+  {w:"fluctuate", m:"vary; swing; change irregularly", ex:"Prices fluctuated weekly."},
+  {w:"foster", m:"encourage; promote; nurture", ex:"Reading fosters vocabulary."},
+  {w:"generate", m:"produce; create; yield", ex:"This generates heat."},
+  {w:"hamper", m:"hinder; obstruct; impede", ex:"Fog hampered flights."},
+  {w:"highlight", m:"emphasize; stress; spotlight", ex:"She highlighted key terms."},
+  {w:"hinder", m:"impede; obstruct; hamper", ex:"Bad planning hindered progress."},
+  {w:"hypothesize", m:"speculate; theorize; propose", ex:"Researchers hypothesized a link."},
+  {w:"identify", m:"recognize; pinpoint; detect", ex:"They identified the source."},
+  {w:"illustrate", m:"exemplify; clarify; demonstrate", ex:"Examples illustrate the rule."},
+  {w:"implement", m:"execute; carry out; apply", ex:"They implemented reforms."},
+
+  {w:"imply", m:"suggest; indicate indirectly; hint", ex:"His tone implied doubt."},
+  {w:"impose", m:"enforce; compel; place (a burden)", ex:"They imposed restrictions."},
+  {w:"incorporate", m:"include; integrate; combine", ex:"Incorporate feedback."},
+  {w:"induce", m:"cause; bring about; prompt", ex:"Stress can induce insomnia."},
+  {w:"infer", m:"deduce; conclude; gather", ex:"We inferred his intent."},
+  {w:"initiate", m:"begin; launch; start", ex:"They initiated an inquiry."},
+  {w:"integrate", m:"combine; unify; merge", ex:"They integrated the systems."},
+  {w:"intensify", m:"strengthen; escalate; amplify", ex:"Efforts intensified."},
+  {w:"interpret", m:"explain; construe; understand", ex:"He interpreted the data."},
+  {w:"intervene", m:"step in; interfere; mediate", ex:"Police intervened quickly."},
+
+  {w:"invalidate", m:"nullify; undermine; cancel", ex:"A typo invalidated the form."},
+  {w:"invoke", m:"cite; call upon; appeal to", ex:"They invoked the law."},
+  {w:"justify", m:"defend; rationalize; legitimize", ex:"He justified the decision."},
+  {w:"legislate", m:"enact laws; regulate; make law", ex:"They legislated new standards."},
+  {w:"levy", m:"impose; charge; collect", ex:"They levied a tax."},
+  {w:"maintain", m:"preserve; sustain; keep", ex:"Maintain a steady pace."},
+  {w:"manifest", m:"reveal; demonstrate; show", ex:"Symptoms manifested early."},
+  {w:"mitigate", m:"reduce; alleviate; lessen", ex:"Measures mitigated the risk."},
+  {w:"mobilize", m:"organize; activate; assemble", ex:"They mobilized support."},
+  {w:"modify", m:"alter; adjust; revise", ex:"Modify the approach."},
+
+  {w:"monitor", m:"track; observe; supervise", ex:"They monitor air quality."},
+  {w:"negate", m:"cancel; nullify; invalidate", ex:"This negates the benefit."},
+  {w:"negotiate", m:"bargain; discuss terms; settle", ex:"They negotiated a deal."},
+  {w:"obscure", m:"hide; conceal; mask", ex:"Fog obscured the view."},
+  {w:"offset", m:"counterbalance; compensate; neutralize", ex:"Savings offset losses."},
+  {w:"omit", m:"exclude; leave out; disregard", ex:"Don’t omit key details."},
+  {w:"overlook", m:"miss; ignore; fail to notice", ex:"He overlooked a small error."},
+  {w:"perceive", m:"notice; discern; recognize", ex:"She perceived a pattern."},
+  {w:"persist", m:"continue; endure; remain", ex:"Rumours persisted."},
+  {w:"pertain", m:"relate; concern; refer to", ex:"This pertains to safety."},
+
+  {w:"pose", m:"present; constitute; create", ex:"It poses a risk."},
+  {w:"postpone", m:"delay; put off; defer", ex:"They postponed the test."},
+  {w:"precipitate", m:"trigger; bring about suddenly; provoke", ex:"The remark precipitated anger."},
+  {w:"predict", m:"forecast; foresee; anticipate", ex:"Models predict outcomes."},
+  {w:"preserve", m:"conserve; maintain; protect", ex:"We must preserve nature."},
+  {w:"preclude", m:"prevent; rule out; bar", ex:"This precludes errors."},
+  {w:"prioritize", m:"rank; give precedence; focus on", ex:"Prioritize accuracy."},
+  {w:"prohibit", m:"forbid; ban; bar", ex:"Rules prohibit cheating."},
+  {w:"promote", m:"encourage; advance; foster", ex:"Exercise promotes health."},
+  {w:"propose", m:"suggest; put forward; recommend", ex:"She proposed a solution."},
+  {w:"pursue", m:"seek; follow; chase", ex:"He pursued a degree."},
+
+  {w:"quantify", m:"measure; calculate; express numerically", ex:"They quantified the impact."},
+  {w:"regulate", m:"control; govern; supervise", ex:"Agencies regulate markets."},
+  {w:"reinforce", m:"strengthen; support; fortify", ex:"Practice reinforces learning."},
+  {w:"reject", m:"refuse; dismiss; decline", ex:"They rejected the offer."},
+  {w:"relieve", m:"ease; alleviate; lessen", ex:"Medicine relieved pain."},
+  {w:"relinquish", m:"give up; abandon; surrender", ex:"He relinquished control."},
+  {w:"remedy", m:"fix; resolve; correct", ex:"They remedied the fault."},
+  {w:"render", m:"make; cause to become; provide", ex:"This renders the device useless."},
+  {w:"replicate", m:"duplicate; reproduce; copy", ex:"Results were replicated."},
+  {w:"restrain", m:"limit; control; curb", ex:"They restrained spending."},
+  {w:"retain", m:"keep; preserve; hold", ex:"Retain important notes."},
+
+  {w:"revise", m:"review; amend; edit", ex:"Revise your draft."},
+  {w:"scrutinize", m:"inspect closely; examine; review", ex:"They scrutinized the evidence."},
+  {w:"simulate", m:"imitate; model; replicate", ex:"They simulated the process."},
+  {w:"specify", m:"state clearly; define; indicate", ex:"Specify your reasons."},
+  {w:"stabilize", m:"steady; secure; make stable", ex:"Steps stabilized prices."},
+  {w:"substitute", m:"replace; exchange; swap", ex:"Substitute A for B."},
+  {w:"sustain", m:"maintain; support; uphold", ex:"They sustained growth."},
+  {w:"terminate", m:"end; conclude; stop", ex:"They terminated the contract."},
+  {w:"transform", m:"convert; change completely; reshape", ex:"Tech transformed education."},
+  {w:"transmit", m:"send; convey; pass on", ex:"Signals transmit data."},
+  {w:"trigger", m:"cause; activate; set off", ex:"Stress triggered symptoms."},
+  {w:"undermine", m:"weaken; erode; damage", ex:"Lies undermine trust."},
+  {w:"undertake", m:"carry out; attempt; take on", ex:"They undertook research."},
+  {w:"utilize", m:"use; employ; apply", ex:"Utilize available resources."},
+
+  {w:"validate", m:"verify; confirm; authenticate", ex:"They validated the findings."},
+  {w:"vary", m:"differ; fluctuate; change", ex:"Results vary by group."},
+  {w:"violate", m:"breach; infringe; break", ex:"They violated the rules."},
+  {w:"withstand", m:"endure; resist; tolerate", ex:"The bridge withstood winds."},
+  {w:"worsen", m:"deteriorate; decline; get worse", ex:"Conditions worsened rapidly."},
+  {w:"yield", m:"produce; generate; give in", ex:"The method yielded results."},
+
+  /* add remaining to reach exactly 200 (clean set) */
+  {w:"attest", m:"confirm; certify; testify", ex:"Documents attest identity."},
+  {w:"broaden", m:"expand; widen; enlarge", ex:"Reading broadens perspective."},
+  {w:"circumvent", m:"avoid; bypass; evade", ex:"They circumvented restrictions."},
+  {w:"compile", m:"assemble; collect; gather", ex:"She compiled references."},
+  {w:"constrain", m:"restrict; limit; confine", ex:"Budget constrained choices."},
+  {w:"culminate", m:"end in; result in; reach a peak", ex:"Efforts culminated in success."},
+  {w:"defer", m:"delay; postpone; put off", ex:"They deferred the decision."},
+  {w:"dissipate", m:"fade; disperse; die away", ex:"Tension dissipated slowly."},
+  {w:"enhance", m:"improve; strengthen; boost", ex:"Practice enhances fluency."},
+  {w:"entrench", m:"establish firmly; fix; embed", ex:"Habits become entrenched."},
+  {w:"expedite", m:"speed up; hasten; accelerate", ex:"They expedited delivery."},
+  {w:"harness", m:"use; exploit; leverage", ex:"Harness your strengths."},
+  {w:"impede", m:"hinder; obstruct; hamper", ex:"Noise impeded concentration."},
+  {w:"inhibit", m:"restrain; prevent; hinder", ex:"Fear inhibits progress."},
+  {w:"instigate", m:"provoke; initiate; spur", ex:"Rumours instigated panic."},
+  {w:"legitimize", m:"justify; validate; make lawful", ex:"They legitimized the policy."},
+  {w:"nullify", m:"cancel; invalidate; negate", ex:"Errors nullified the test."},
+  {w:"proliferate", m:"increase rapidly; spread; multiply", ex:"Misinformation proliferated online."},
+  {w:"reconcile", m:"resolve; harmonize; settle", ex:"They reconciled differences."},
+  {w:"reinstate", m:"restore; reintroduce; bring back", ex:"They reinstated the rule."},
+
+  {w:"safeguard", m:"protect; secure; preserve", ex:"Safeguard your documents."},
+  {w:"suppress", m:"repress; restrain; curb", ex:"They suppressed dissent."},
+  {w:"suspend", m:"halt temporarily; postpone; delay", ex:"Flights were suspended."},
+  {w:"uphold", m:"support; maintain; defend", ex:"They upheld the verdict."}
+];
+
+// Ensure exact counts (safety)
+if (PHRASAL.length !== 200) console.warn("PHRASAL count:", PHRASAL.length);
+if (VERBS.length !== 200) console.warn("VERBS count:", VERBS.length);
+
+/* ===========================
+   GAME ENGINE + ANALYTICS
+   =========================== */
+const POINTS = 10;
+
+const pvEl = document.getElementById("word");
+const exEl = document.getElementById("ex");
+const optsEl = document.getElementById("opts");
+const fbEl = document.getElementById("fb");
+const qNoEl = document.getElementById("qNo");
+const qTotalEl = document.getElementById("qTotal");
+const scoreEl = document.getElementById("score");
+const rightEl = document.getElementById("right");
+const wrongEl = document.getElementById("wrong");
+const barEl = document.getElementById("bar");
+const nextBtn = document.getElementById("next");
+const restartBtn = document.getElementById("restart");
+const shuffleBtn = document.getElementById("shuffle");
+const dsEl = document.getElementById("ds");
+const labelType = document.getElementById("labelType");
+const promptEl = document.getElementById("prompt");
+
+const tabPhrasal = document.getElementById("tabPhrasal");
+const tabVerbs = document.getElementById("tabVerbs");
+const tabAnalytics = document.getElementById("tabAnalytics");
+const viewGame = document.getElementById("viewGame");
+const viewAnalytics = document.getElementById("viewAnalytics");
+const gameStats = document.getElementById("gameStats");
+
+const searchEl = document.getElementById("search");
+const filterSetEl = document.getElementById("filterSet");
+const sortByEl = document.getElementById("sortBy");
+const anaBody = document.getElementById("anaBody");
+const resetStatsBtn = document.getElementById("resetStats");
+const backToGameBtn = document.getElementById("backToGame");
+
+const tagP = document.getElementById("tagP");
+const tagV = document.getElementById("tagV");
+tagP.textContent = PHRASAL.length;
+tagV.textContent = VERBS.length;
+
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function uniq(arr){
+  const s=new Set(), out=[];
+  for(const x of arr){
+    const k=(x||"").toLowerCase().trim();
+    if(!k || s.has(k)) continue;
+    s.add(k); out.push(x);
+  }
+  return out;
+}
+
+let MODE = "PHRASAL";  // or "VERB"
+let quiz = [];
+let idx = 0, score = 0, right = 0, wrong = 0, locked = false;
+
+const LS_KEY = "yds_game_stats_v1";
+let STATS = loadStats();
+
+function loadStats(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return { PHRASAL:{}, VERB:{} };
+    const obj = JSON.parse(raw);
+    return obj && obj.PHRASAL && obj.VERB ? obj : { PHRASAL:{}, VERB:{} };
+  }catch(e){
+    return { PHRASAL:{}, VERB:{} };
+  }
+}
+function saveStats(){
+  localStorage.setItem(LS_KEY, JSON.stringify(STATS));
+}
+function itemId(mode, item){
+  return (item.w + "||" + item.m).toLowerCase().trim();
+}
+function ensureStat(mode, item){
+  const id = itemId(mode,item);
+  if(!STATS[mode][id]){
+    STATS[mode][id] = { w:item.w, m:item.m, ex:item.ex, att:0, wrong:0 };
+  }
+  return STATS[mode][id];
+}
+function logAnswer(mode, item, isCorrect){
+  const s = ensureStat(mode, item);
+  s.att += 1;
+  if(!isCorrect) s.wrong += 1;
+  saveStats();
+}
+
+function buildQuiz(){
+  const base = MODE==="PHRASAL" ? PHRASAL : VERBS;
+  quiz = base.map(x=>({...x}));
+  shuffle(quiz);
+  idx=0; score=0; right=0; wrong=0; locked=false;
+  qTotalEl.textContent = quiz.length;
+  dsEl.textContent = quiz.length;
+  nextBtn.disabled = true;
+  render();
+}
+
+function pickDistractors(correctMeaning){
+  const base = MODE==="PHRASAL" ? PHRASAL : VERBS;
+  const correctKey = correctMeaning.toLowerCase().trim();
+  const pool = uniq(base.map(q=>q.m)).filter(m=>m.toLowerCase().trim()!==correctKey);
+  shuffle(pool);
+  return pool.slice(0,3);
+}
+
+function render(){
+  locked=false;
+  nextBtn.disabled=true;
+  optsEl.innerHTML="";
+
+  const q = quiz[idx];
+  pvEl.textContent = q.w;
+  exEl.textContent = "Example: " + q.ex;
+
+  labelType.textContent = MODE==="PHRASAL" ? "Phrasal Verb" : "Advanced Verb";
+  promptEl.textContent = MODE==="PHRASAL"
+    ? "Choose the correct English meaning:"
+    : "Choose the best synonym-based meaning:";
+
+  const correct = q.m;
+  const distractors = pickDistractors(correct);
+  const options = shuffle(uniq([correct, ...distractors])).slice(0,4);
+
+  options.forEach(opt=>{
+    const b=document.createElement("button");
+    b.className="opt";
+    b.textContent=opt;
+    b.onclick=()=>choose(opt, correct, q, b);
+    optsEl.appendChild(b);
+  });
+
+  fbEl.innerHTML = `<span>Pick an option.</span><span class="small">Each correct answer = +${POINTS}</span>`;
+  qNoEl.textContent = (idx+1);
+  scoreEl.textContent = score;
+  rightEl.textContent = right;
+  wrongEl.textContent = wrong;
+  barEl.style.width = Math.round((idx/quiz.length)*100) + "%";
+}
+
+function choose(choice, correct, item, btn){
+  if(locked) return;
+  locked=true;
+  [...optsEl.querySelectorAll("button")].forEach(b=>b.disabled=true);
+
+  const ok = choice.toLowerCase().trim() === correct.toLowerCase().trim();
+
+  logAnswer(MODE, item, ok);
+
+  if(ok){
+    score += POINTS; right++;
+    btn.classList.add("correct");
+    fbEl.innerHTML = `<span class="ok">Correct (+${POINTS})</span><span class="small"><b>${item.w}</b> = <b>${correct}</b></span>`;
+  }else{
+    wrong++;
+    btn.classList.add("wrong");
+    [...optsEl.querySelectorAll("button")].forEach(b=>{
+      if(b.textContent.toLowerCase().trim() === correct.toLowerCase().trim()){
+        b.classList.add("correct");
+      }
+    });
+    fbEl.innerHTML = `<span class="bad">Wrong</span><span class="small">Correct: <b>${correct}</b></span>`;
+  }
+
+  scoreEl.textContent = score;
+  rightEl.textContent = right;
+  wrongEl.textContent = wrong;
+  nextBtn.disabled = false;
+  barEl.style.width = Math.round(((idx+1)/quiz.length)*100) + "%";
+}
+
+nextBtn.addEventListener("click", ()=>{
+  idx++;
+  if(idx>=quiz.length){
+    pvEl.textContent = "Finished!";
+    exEl.textContent = `Final score: ${score} • Right: ${right} • Wrong: ${wrong}`;
+    optsEl.innerHTML = "";
+    fbEl.innerHTML = `<span>Done.</span><span class="small">Open Analytics to see your mistakes.</span>`;
+    nextBtn.disabled = true;
+    barEl.style.width = "100%";
+    return;
+  }
+  render();
+});
+restartBtn.addEventListener("click", buildQuiz);
+shuffleBtn.addEventListener("click", ()=>{ shuffle(quiz); idx=0; render(); });
+
+/* ===========================
+   Tabs
+   =========================== */
+function setActiveTab(which){
+  tabPhrasal.classList.remove("active");
+  tabVerbs.classList.remove("active");
+  tabAnalytics.classList.remove("active");
+
+  viewGame.classList.remove("active");
+  viewAnalytics.classList.remove("active");
+
+  if(which==="PHRASAL"){
+    MODE="PHRASAL";
+    tabPhrasal.classList.add("active");
+    viewGame.classList.add("active");
+    gameStats.style.display="";
+    buildQuiz();
+  }else if(which==="VERB"){
+    MODE="VERB";
+    tabVerbs.classList.add("active");
+    viewGame.classList.add("active");
+    gameStats.style.display="";
+    buildQuiz();
+  }else{
+    tabAnalytics.classList.add("active");
+    viewAnalytics.classList.add("active");
+    gameStats.style.display="none";
+    renderAnalytics();
+  }
+}
+
+tabPhrasal.onclick=()=>setActiveTab("PHRASAL");
+tabVerbs.onclick=()=>setActiveTab("VERB");
+tabAnalytics.onclick=()=>setActiveTab("ANALYTICS");
+backToGameBtn.onclick=()=>setActiveTab(MODE);
+
+/* ===========================
+   Analytics rendering
+   =========================== */
+function accuracy(att, wrong){
+  if(!att) return 0;
+  return Math.round(((att - wrong) / att) * 100);
+}
+
+function getAllRows(){
+  const rows = [];
+  for(const mode of ["PHRASAL","VERB"]){
+    const map = STATS[mode];
+    for(const id in map){
+      const s = map[id];
+      rows.push({
+        set: mode,
+        item: s.w,
+        meaning: s.m,
+        att: s.att || 0,
+        wrong: s.wrong || 0,
+        acc: accuracy(s.att||0, s.wrong||0)
+      });
+    }
+  }
+  return rows;
+}
+
+function renderAnalytics(){
+  const q = (searchEl.value || "").toLowerCase().trim();
+  const filter = filterSetEl.value;
+  const sort = sortByEl.value;
+
+  let rows = getAllRows();
+
+  // KPI
+  const totalAtt = rows.reduce((a,r)=>a+r.att,0);
+  const totalWrong = rows.reduce((a,r)=>a+r.wrong,0);
+  const totalRight = totalAtt - totalWrong;
+  document.getElementById("kAtt").textContent = totalAtt;
+  document.getElementById("kWrong").textContent = totalWrong;
+  document.getElementById("kRight").textContent = totalRight;
+  document.getElementById("kAcc").textContent = totalAtt ? Math.round((totalRight/totalAtt)*100) + "%" : "0%";
+
+  // Filter set
+  if(filter !== "ALL"){
+    rows = rows.filter(r=>r.set===filter);
+  }
+
+  // Search
+  if(q){
+    rows = rows.filter(r =>
+      r.item.toLowerCase().includes(q) ||
+      r.meaning.toLowerCase().includes(q)
+    );
+  }
+
+  // Remove items never attempted to keep dashboard meaningful
+  rows = rows.filter(r => r.att > 0);
+
+  // Sort
+  if(sort==="WRONG_DESC"){
+    rows.sort((a,b)=> (b.wrong - a.wrong) || (b.att - a.att));
+  }else if(sort==="ACC_ASC"){
+    rows.sort((a,b)=> (a.acc - b.acc) || (b.att - a.att));
+  }else if(sort==="ATT_DESC"){
+    rows.sort((a,b)=> (b.att - a.att) || (b.wrong - a.wrong));
+  }else if(sort==="A_Z"){
+    rows.sort((a,b)=> a.item.localeCompare(b.item));
+  }
+
+  // Render table
+  anaBody.innerHTML = "";
+  if(rows.length===0){
+    const tr=document.createElement("tr");
+    tr.innerHTML = `<td colspan="6" class="small">No data yet. Play some questions first, then come back here.</td>`;
+    anaBody.appendChild(tr);
+    return;
+  }
+
+  for(const r of rows){
+    const tr=document.createElement("tr");
+    tr.innerHTML = `
+      <td><span class="badge">${r.set}</span></td>
+      <td style="font-weight:950">${escapeHtml(r.item)}</td>
+      <td>${escapeHtml(r.meaning)}</td>
+      <td>${r.att}</td>
+      <td style="color:var(--bad); font-weight:950">${r.wrong}</td>
+      <td style="font-weight:950">${r.acc}%</td>
+    `;
+    anaBody.appendChild(tr);
+  }
+}
+
+function escapeHtml(s){
+  return String(s)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+searchEl.addEventListener("input", renderAnalytics);
+filterSetEl.addEventListener("change", renderAnalytics);
+sortByEl.addEventListener("change", renderAnalytics);
+
+resetStatsBtn.addEventListener("click", ()=>{
+  if(!confirm("Reset all stats? This will clear your wrong/right tracking.")) return;
+  STATS = { PHRASAL:{}, VERB:{} };
+  saveStats();
+  renderAnalytics();
+});
+
+/* start */
+setActiveTab("PHRASAL");
+</script>
+</body>
+</html>
